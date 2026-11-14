@@ -2,6 +2,16 @@
 
 The latest version of the changelog can be found [here](https://github.com/Azure/bicep-registry-modules/blob/main/avm/res/key-vault/vault/CHANGELOG.md).
 
+## 0.15.0
+
+### Changes
+
+- Added `SecuredByPerimeter` to the allowed `publicNetworkAccess` values and documented its Network Security Perimeter behavior. Existing defaults are unchanged.
+
+### Breaking Changes
+
+- None
+
 ## 0.14.2
 
 ### Changes

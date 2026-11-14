@@ -45,7 +45,8 @@ The following section provides usage examples for the module, which were used to
 - [With EC key type](#example-2-with-ec-key-type)
 - [Using large parameter set](#example-3-using-large-parameter-set)
 - [With RSA key type](#example-4-with-rsa-key-type)
-- [WAF-aligned](#example-5-waf-aligned)
+- [Using perimeter-secured network access](#example-5-using-perimeter-secured-network-access)
+- [WAF-aligned](#example-6-waf-aligned)
 
 ### Example 1: _Using only defaults_
 
@@ -1236,7 +1237,77 @@ param keys = [
 </details>
 <p>
 
-### Example 5: _WAF-aligned_
+### Example 5: _Using perimeter-secured network access_
+
+This instance deploys a vault with SecuredByPerimeter and no perimeter association, allowing only private endpoint traffic.
+
+You can find the full example and the setup of its dependencies in the deployment test folder path [/tests/e2e/secured-by-perimeter]
+
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module vault 'br/public:avm/res/key-vault/vault:<version>' = {
+  params: {
+    // Required parameters
+    name: '<name>'
+    // Non-required parameters
+    enablePurgeProtection: false
+    publicNetworkAccess: 'SecuredByPerimeter'
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via JSON parameters file</summary>
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    // Required parameters
+    "name": {
+      "value": "<name>"
+    },
+    // Non-required parameters
+    "enablePurgeProtection": {
+      "value": false
+    },
+    "publicNetworkAccess": {
+      "value": "SecuredByPerimeter"
+    }
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Bicep parameters file</summary>
+
+```bicep-params
+using 'br/public:avm/res/key-vault/vault:<version>'
+
+// Required parameters
+param name = '<name>'
+// Non-required parameters
+param enablePurgeProtection = false
+param publicNetworkAccess = 'SecuredByPerimeter'
+```
+
+</details>
+<p>
+
+### Example 6: _WAF-aligned_
 
 This instance deploys the module in alignment with the best-practices of the Well-Architected Framework.
 
@@ -1577,7 +1648,7 @@ param tags = {
 | [`lock`](#parameter-lock) | object | The lock settings of the service. |
 | [`networkAcls`](#parameter-networkacls) | object | Rules governing the accessibility of the resource from specific network locations. |
 | [`privateEndpoints`](#parameter-privateendpoints) | array | Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible. |
-| [`publicNetworkAccess`](#parameter-publicnetworkaccess) | string | Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set. |
+| [`publicNetworkAccess`](#parameter-publicnetworkaccess) | string | Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set. SecuredByPerimeter uses Network Security Perimeter rules when the vault is associated with a perimeter; trusted services also require perimeter admission instead of the trusted-service bypass. Without a perimeter association, SecuredByPerimeter allows only private endpoint traffic. |
 | [`roleAssignments`](#parameter-roleassignments) | array | Array of role assignments to create. |
 | [`secrets`](#parameter-secrets) | array | All secrets to create. |
 | [`sku`](#parameter-sku) | string | Specifies the SKU for the vault. |
@@ -2930,7 +3001,7 @@ Tags to be applied on all resources/Resource Groups in this deployment.
 
 ### Parameter: `publicNetworkAccess`
 
-Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set.
+Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and networkAcls are not set. SecuredByPerimeter uses Network Security Perimeter rules when the vault is associated with a perimeter; trusted services also require perimeter admission instead of the trusted-service bypass. Without a perimeter association, SecuredByPerimeter allows only private endpoint traffic.
 
 - Required: No
 - Type: string
@@ -2941,6 +3012,7 @@ Whether or not public network access is allowed for this resource. For security 
     ''
     'Disabled'
     'Enabled'
+    'SecuredByPerimeter'
   ]
   ```
 
